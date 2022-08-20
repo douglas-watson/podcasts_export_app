@@ -1,0 +1,9 @@
+altgraph @ file:///home/linux1/recipes/ci/altgraph_1611055153312/work
+certifi @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_83242e7e-f82d-4a71-8ef2-9d71d212d249gu_wxmeq/croots/recipe/certifi_1655968827803/work/certifi
+macholib @ file:///home/linux1/recipes/ci/macholib_1611055836792/work
+pycryptodome @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_27562593-71a8-45e2-8fc7-2dfadfb41e70j6urw04g/croots/recipe/pycryptodome_1658311003559/work
+pyinstaller @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/croot-7o3wwtyh/pyinstaller_1643735602344/work
+PySide6==6.3.1
+PySide6-Addons==6.3.1
+PySide6-Essentials==6.3.1
+shiboken6==6.3.1
