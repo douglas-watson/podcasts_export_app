@@ -27,21 +27,20 @@ where ZASSETURL NOTNULL;
 """
 
 
-def get_downloaded_episodes(db_path):
-    return sqlite3.connect(db_path).execute(SQL).fetchall()
+def get_downloaded_episodes(set_progress):
+    """ Returns list of episodes.
+    Format [[author, podcast, title, path, zpubdate], ...]
+    """
+    return sqlite3.connect(get_db_path()).execute(SQL).fetchall()
     
 def get_db_path():
     return os.path.expanduser(
         "~/Library/Group Containers/243LU875E5.groups.com.apple.podcasts/Documents/MTLibrary.sqlite")
 
-
-
-
-def export(db_path, output_dir, set_progress=None):
+def export(episodes, output_dir, set_progress=None):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    episodes = get_downloaded_episodes(db_path)
     counter = 0
     for author, podcast, title, path, zpubdate in episodes:
         if set_progress is not None:
