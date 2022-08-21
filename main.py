@@ -16,11 +16,12 @@
 
 import os
 import sys
+import pathlib
 import datetime
 
 from PySide6.QtCore import Slot, QThreadPool
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QVBoxLayout, QPushButton, QWidget, QProgressBar, \
-    QTableWidget, QTableWidgetItem, QAbstractItemView
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QGridLayout, QPushButton, QWidget, QProgressBar, \
+    QTableWidget, QTableWidgetItem, QAbstractItemView, QLineEdit, QFileDialog, QPlainTextEdit
 from PySide6.QtGui import QIcon
 
 import export
@@ -39,11 +40,24 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Podcasts Export")
         self.resize(800, 400)
-        layout = QVBoxLayout()
+        layout = QGridLayout()
         label = QLabel("Export your downloaded episodes from Apple Podcasts.")
         label.setMargin(10)
-        layout.addWidget(label)
+        layout.addWidget(label, 0, 0, 1, 3)
 
+        # Destination folder selection
+        label = QLabel("Destination Folder:")
+        label.setMargin(10)
+        layout.addWidget(label, 1, 0)
+
+        self.dest_folder = QLineEdit(os.path.join(pathlib.Path.home(), "Desktop"))
+        layout.addWidget(self.dest_folder, 1, 1)
+
+        self.browse_button = QPushButton("Browse...")
+        self.browse_button.pressed.connect(self.browse)
+        layout.addWidget(self.browse_button, 1, 2)
+
+        # Episodes display
         self.table = QTableWidget()
         self.table.setRowCount(8)
         self.table.setColumnCount(5)
@@ -55,15 +69,27 @@ class MainWindow(QMainWindow):
         self.table.setColumnHidden(4, True) # Keep track of original index
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        layout.addWidget(self.table)
+        layout.addWidget(self.table, 2, 0, 1, 3)
         
+        # Progress bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)
-        layout.addWidget(self.progress_bar)
+        layout.addWidget(self.progress_bar, 3, 0, 1, 3)
+
+        # Results
+        self.results = QPlainTextEdit()
+        self.results.hide()
+        layout.addWidget(self.results, 4, 0, 1, 3)
+
+        # Lower buttons
+        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button.pressed.connect(self.get_episodes)
+        layout.addWidget(self.refresh_button, 5, 0)
 
         self.export_button = QPushButton("Export")
         self.export_button.pressed.connect(self.export_episodes)
-        layout.addWidget(self.export_button)
+        layout.addWidget(self.export_button, 5, 2)
+        
 
         container = QWidget()
         container.setLayout(layout)
@@ -75,9 +101,19 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def refresh_episodes(self, episodes):
+    @Slot()
+    def browse(self):
+        directory = QFileDialog.getExistingDirectory(self, "Choose destination folder", 
+            self.dest_folder.text())
+        
+        if directory:
+            self.dest_folder.setText(directory)
+
+    def redraw_episodes(self, episodes):
         """ Fill table from list of episodes """
         self.episodes = episodes
+        self.table.clearContents()
+        self.table.setSortingEnabled(False)
         self.table.setRowCount(len(episodes))
         for i, ep in enumerate(episodes):
             index = QTableWidgetItem(str(i))
@@ -111,15 +147,16 @@ class MainWindow(QMainWindow):
         self.export_button.setEnabled(True)
         self.update_progress(100)
 
-    def export_refresh_result(self, result):
+    def export_redraw_result(self, result):
         # TODO: show any errors.
-        print(result)
+        self.results.show()
+        self.results.setPlainText("Results go here.")
 
     @Slot()
     def get_episodes(self):
         """ Get all downloaded episodes and show in table """
         worker = Worker(export.get_downloaded_episodes) 
-        worker.signals.result.connect(self.refresh_episodes)
+        worker.signals.result.connect(self.redraw_episodes)
         # worker.signals.finished.connect(self.export_finished)
         # worker.signals.progress.connect(self.update_progress)
 
@@ -130,8 +167,8 @@ class MainWindow(QMainWindow):
     def export_episodes(self):
         """ Get all downloaded episodes and copy to target dir. """
 
-        worker = Worker(export.export, self.get_selected(),"/Users/douglas/Desktop/exported")
-        worker.signals.result.connect(self.export_refresh_result)
+        worker = Worker(export.export, self.get_selected(), self.dest_folder.text())
+        worker.signals.result.connect(self.export_redraw_result)
         worker.signals.finished.connect(self.export_finished)
         worker.signals.progress.connect(self.update_progress)
 
