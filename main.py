@@ -11,8 +11,6 @@
 #  main.py: draw GUI and handle GUI events (button clicks, progress display...)
 
 # TODO: add an Abort button?
-# TODO: handle those weird non-mp3 files.
-
 
 import os
 import sys
@@ -197,11 +195,11 @@ class MainWindow(QMainWindow):
     def export_episodes(self):
         """ Get all downloaded episodes and copy to target dir. """
 
-        worker = Worker(export.export, self.get_selected(), self.dest_folder.text(),
-            emit_message=self.export_redraw_result)
+        worker = Worker(export.export, self.get_selected(), self.dest_folder.text())
         worker.signals.result.connect(self.export_redraw_result)
         worker.signals.finished.connect(self.export_finished)
         worker.signals.progress.connect(self.update_progress)
+        worker.signals.message.connect(self.export_redraw_result)
 
         # Execute
         self.export_started()

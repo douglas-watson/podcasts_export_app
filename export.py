@@ -14,6 +14,7 @@ import urllib.parse
 import sqlite3
 import datetime
 
+from distutils.dir_util import copy_tree
 from mutagen.mp3 import MP3, HeaderNotFoundError
 from mutagen.easyid3 import EasyID3
 
@@ -27,7 +28,7 @@ where ZASSETURL NOTNULL;
 """
 
 
-def get_downloaded_episodes(set_progress):
+def get_downloaded_episodes(set_progress=print, emit_message=print):
     """ Returns list of episodes.
     Format [[author, podcast, title, path, zpubdate], ...]
     """
@@ -56,13 +57,17 @@ def export(episodes, output_dir, set_progress=None, emit_message=print):
         if not os.path.exists(podcast_path):
             os.makedirs(podcast_path)
 
+        source_path = urllib.parse.unquote(path[len('file://'):])
+        ext = os.path.splitext(source_path)[1] or ".mp3"
         dest_path = os.path.join(podcast_path,
-                                 u"{:%Y.%m.%d}-{}-({}).mp3".format(pubdate, safe_title[0:140], safe_author[0:100]))
-        try:
-            shutil.copy(urllib.parse.unquote(path[len('file://'):]), dest_path)
-        except IsADirectoryError:
-            emit_message(u"Failed to export {} - {}, media file is not an mp3 file".format(podcast, title))
+                                 u"{:%Y.%m.%d}-{}-({}){}".format(pubdate, safe_title[0:140], safe_author[0:100], ext))
+
+        if ext == ".movpkg":
+            emit_message(u"{} - {}, media file is not an mp3 file, may require further conversion".format(podcast, title))
+            copy_tree(source_path, dest_path)
             continue
+        else:
+            shutil.copy(urllib.parse.unquote(path[len('file://'):]), dest_path)
 
         try:
             mp3 = MP3(dest_path, ID3=EasyID3)

@@ -36,6 +36,7 @@ class WorkerSignals(QObject):
     result = Signal(object)
     progress = Signal(float)
     status = Signal(int)
+    message = Signal(str)
 
 
 class Worker(QRunnable):
@@ -71,6 +72,7 @@ class Worker(QRunnable):
             result = self.fn(
                 *self.args, **self.kwargs,
                 set_progress=self.signals.progress.emit,
+                emit_message=self.signals.message.emit,
             )
         except:
             traceback.print_exc()
