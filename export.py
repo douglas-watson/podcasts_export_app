@@ -37,7 +37,7 @@ def get_db_path():
     return os.path.expanduser(
         "~/Library/Group Containers/243LU875E5.groups.com.apple.podcasts/Documents/MTLibrary.sqlite")
 
-def export(episodes, output_dir, set_progress=None):
+def export(episodes, output_dir, set_progress=None, emit_result=print):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -61,13 +61,13 @@ def export(episodes, output_dir, set_progress=None):
         try:
             shutil.copy(urllib.parse.unquote(path[len('file://'):]), dest_path)
         except IsADirectoryError:
-            print(u"Failed to export {} - {}, media file is not an mp3 file".format(podcast, title))
+            emit_result(u"Failed to export {} - {}, media file is not an mp3 file".format(podcast, title))
             continue
 
         try:
             mp3 = MP3(dest_path, ID3=EasyID3)
         except HeaderNotFoundError:
-            print(u"Corrupted file: {} - {}".format(podcast, title))
+            emit_result(u"Corrupted file: {} - {}".format(podcast, title))
             continue
         if mp3.tags is None:
             mp3.add_tags()

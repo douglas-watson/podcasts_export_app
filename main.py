@@ -10,7 +10,6 @@
 #
 #  main.py: draw GUI and handle GUI events (button clicks, progress display...)
 
-# TODO: replace date by a QDateTime?
 # TODO: add an Abort button?
 
 
@@ -19,7 +18,7 @@ import sys
 import pathlib
 import datetime
 
-from PySide6.QtCore import Slot, QThreadPool
+from PySide6.QtCore import Qt, Slot, QThreadPool, QDate
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QGridLayout, QPushButton, QWidget, QProgressBar, \
     QTableWidget, QTableWidgetItem, QAbstractItemView, QLineEdit, QFileDialog, QPlainTextEdit
 from PySide6.QtGui import QIcon
@@ -50,7 +49,7 @@ class MainWindow(QMainWindow):
         label.setMargin(10)
         layout.addWidget(label, 1, 0)
 
-        self.dest_folder = QLineEdit(os.path.join(pathlib.Path.home(), "Desktop"))
+        self.dest_folder = QLineEdit(os.path.join(pathlib.Path.home(), "Desktop", "export"))
         layout.addWidget(self.dest_folder, 1, 1)
 
         self.browse_button = QPushButton("Browse...")
@@ -78,6 +77,8 @@ class MainWindow(QMainWindow):
 
         # Results
         self.results = QPlainTextEdit()
+        self.results.setReadOnly(True)
+        self.results.setFixedHeight(100)
         self.results.hide()
         layout.addWidget(self.results, 4, 0, 1, 3)
 
@@ -101,10 +102,12 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    @Slot()
+    # @Slot()
     def browse(self):
+        self.browse_button.setDisabled(True)
         directory = QFileDialog.getExistingDirectory(self, "Choose destination folder", 
             self.dest_folder.text())
+        self.browse_button.setEnabled(True)
         
         if directory:
             self.dest_folder.setText(directory)
@@ -122,7 +125,8 @@ class MainWindow(QMainWindow):
             title = QTableWidgetItem(ep[2])
 
             pubdate = datetime.datetime(2001, 1, 1) + datetime.timedelta(seconds=ep[4])
-            date = QTableWidgetItem("{:%Y.%m.%d}".format(pubdate))
+            date = QTableWidgetItem()
+            date.setData(Qt.DisplayRole, QDate(pubdate.year, pubdate.month, pubdate.day))
 
             self.table.setItem(i, 0, author)
             self.table.setItem(i, 1, podcast)
@@ -135,22 +139,24 @@ class MainWindow(QMainWindow):
     def get_selected(self):
         selected_rows = [index.row() for index in self.table.selectionModel().selectedRows()]
         selected_indices = [int(self.table.item(i, 4).text()) for i in selected_rows]
-        return [self.episodes[i] for i in selected_indices]
+        if selected_rows:
+            return [self.episodes[i] for i in selected_indices]
+        return self.episodes
         
     def update_progress(self, p):
         self.progress_bar.setValue(p)
 
     def export_started(self):
         self.export_button.setDisabled(True)
+        self.results.clear()
 
     def export_finished(self):
         self.export_button.setEnabled(True)
         self.update_progress(100)
 
     def export_redraw_result(self, result):
-        # TODO: show any errors.
         self.results.show()
-        self.results.setPlainText("Results go here.")
+        self.results.appendPlainText(result)
 
     @Slot()
     def get_episodes(self):
@@ -167,7 +173,8 @@ class MainWindow(QMainWindow):
     def export_episodes(self):
         """ Get all downloaded episodes and copy to target dir. """
 
-        worker = Worker(export.export, self.get_selected(), self.dest_folder.text())
+        worker = Worker(export.export, self.get_selected(), self.dest_folder.text(),
+            emit_result=self.export_redraw_result)
         worker.signals.result.connect(self.export_redraw_result)
         worker.signals.finished.connect(self.export_finished)
         worker.signals.progress.connect(self.update_progress)
