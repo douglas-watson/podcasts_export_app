@@ -5,9 +5,18 @@ Douglas Watson, 2022, MIT License
 
 A macOS app that exports apple podcasts to a folder, for later use on a portable mp3 player.
 
-![Podcasts Export Screenshot](images/screenshot.png)
+[Download here](https://github.com/douglas-watson/podcasts_export_app/releases/download/v1.0.0/PodcastsExport.dmg)
+
+[![Podcasts Export Screenshot](images/screenshot.png)](https://github.com/douglas-watson/podcasts_export_app/releases/download/v1.0.0/PodcastsExport.dmg)
 
 Following the creation of my [automator script](https://github.com/douglas-watson/podcasts_export), many people struggled to install or use it, due to python dependencies. This project is an attempt to help those people by distributing a proper app. If all goes well, it should install like any other macOS app.
+
+Installing
+----------
+
+Download the [dmg](https://github.com/douglas-watson/podcasts_export_app/releases/download/v1.0.0/PodcastsExport.dmg). Open it, and drag the app to your Applications folder:
+
+![Installer](images/installer.png)
 
 
 🎆 New features 🎆
