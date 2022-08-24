@@ -20,7 +20,7 @@ import datetime
 from PySide6.QtCore import Qt, Slot, QThreadPool, QDate
 from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QGridLayout, QPushButton, QWidget, QProgressBar, \
     QTableWidget, QTableWidgetItem, QAbstractItemView, QLineEdit, QFileDialog, QPlainTextEdit
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QDesktopServices
 
 import export
 from worker import Worker
@@ -103,9 +103,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.export_button, 6, 2)
 
         self.begging = QLabel(
-            '<i>Found this useful? Consider buying my next beer! </i>🍻'
+            '<i>Found this useful? Consider <a href=https://www.buymeacoffee.com/dougw">buying my next beer!</a></i>🍻'
         )
-        # self.begging.setStyleSheet("p {font-style: italic}")
+        self.begging.mousePressEvent = lambda e: QDesktopServices.openUrl("https://www.buymeacoffee.com/dougw")
         self.begging.setAlignment(Qt.AlignCenter)
         self.begging.hide()
         layout.addWidget(self.begging, 7, 0, 1, 3)
