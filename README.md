@@ -18,6 +18,19 @@ Download the [dmg](https://github.com/douglas-watson/podcasts_export_app/release
 
 ![Installer](images/installer.png)
 
+Since I am not a registered Apple developer, you will have to explicitely trust this app. **When you first open the app, nothing happens** as macOS blocks unregistered apps. 
+
+Go to System Prefences > Security & Privacy:
+
+![macOS menu screenshot](images/menu.png)
+![System preferences screenshot](images/preferences.png)
+
+You should see a message warning that I am not a registered developer. Click **Open Anyway**:
+![Security preferences screenshot](images/security.png)
+
+You may need to confirm a second time:
+![Security warning screenshot](images/security_warning.png)
+
 
 🎆 New features 🎆
 -----------------
