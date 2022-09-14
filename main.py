@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.export_button, 6, 2)
 
         self.begging = QLabel(
-            '<i>Found this useful? Consider <a href=https://www.buymeacoffee.com/dougw">buying my next beer!</a></i>🍻'
+            '<i>Found this useful? Consider <a href="https://www.buymeacoffee.com/dougw">buying my next beer!</a></i>🍻'
         )
         self.begging.mousePressEvent = lambda e: QDesktopServices.openUrl("https://www.buymeacoffee.com/dougw")
         self.begging.setAlignment(Qt.AlignCenter)
