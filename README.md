@@ -31,6 +31,10 @@ You should see a message warning that I am not a registered developer. Click **O
 You may need to confirm a second time:
 ![Security warning screenshot](images/security_warning.png)
 
+Command Line Interface
+----------------------
+
+If you're comfortable with command line interfaces then you can avoid overridding the macOS security checks described above while staying safe. Download the `export.py` file and use it like this: `./export.py output_directory`. If you're still (rightly) concerned about running random code downloaded from the Internet then take a look at `export.py`: it is less than 100 lines long and its only dependency is `pip3 install mutagen`.
 
 🎆 New features 🎆
 -----------------

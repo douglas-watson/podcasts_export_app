@@ -80,3 +80,9 @@ def export(episodes, output_dir, set_progress=None, emit_message=print):
         mp3.tags['album'] = podcast
         mp3.tags['title'] = title
         mp3.save()
+
+# This provides a very basic but functional Command Line Interface with
+# 'mutagen' as the only dependency
+if __name__ == '__main__':
+        output_dir = sys.argv[1]
+        export(get_downloaded_episodes(), output_dir)
