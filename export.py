@@ -15,7 +15,9 @@ import sqlite3
 import datetime
 
 from distutils.dir_util import copy_tree
+from mutagen import MutagenError
 from mutagen.mp3 import MP3, HeaderNotFoundError
+from mutagen.mp4 import MP4
 from mutagen.easyid3 import EasyID3
 
 
@@ -68,6 +70,19 @@ def export(episodes, output_dir, set_progress=None, emit_message=print):
             continue
         else:
             shutil.copy(urllib.parse.unquote(path[len('file://'):]), dest_path)
+
+        if ext == ".m4a":
+            try:
+                mp4 = MP4(dest_path)
+                if mp4.tags is None:
+                    mp4.add_tags()
+                mp4.tags['\xa9ART'] = author
+                mp4.tags['\xa9alb'] = podcast
+                mp4.tags['\xa9nam'] = title
+                mp4.save()
+                continue
+            except MutagenError:
+                pass
 
         try:
             mp3 = MP3(dest_path, ID3=EasyID3)
