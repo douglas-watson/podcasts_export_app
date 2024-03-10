@@ -4,7 +4,7 @@
 #  ---------------
 #  Douglas Watson, 2022, MIT License
 #
-#  export.py: reads list of available episodes from to Podcasts.app database, 
+#  export.py: reads list of available episodes from Podcasts.app database, 
 #             copies downloaded episodes to specified folder.
 
 import os
@@ -16,6 +16,7 @@ import datetime
 
 from distutils.dir_util import copy_tree
 from mutagen.mp3 import MP3, HeaderNotFoundError
+from mutagen.mp4 import MP4
 from mutagen.easyid3 import EasyID3
 
 
@@ -68,6 +69,17 @@ def export(episodes, output_dir, set_progress=None, emit_message=print):
             continue
         else:
             shutil.copy(urllib.parse.unquote(path[len('file://'):]), dest_path)
+
+        if ext == ".mp4":
+            emit_message(u"{} - {} is an mp4 file.".format(podcast, title))
+            mp4 = MP4(dest_path)
+            if mp4.tags is None:
+                mp4.add_tags()
+            mp4.tags['\xa9ART'] = author
+            mp4.tags['\xa9alb'] = podcast
+            mp4.tags['\xa9nam'] = title
+            mp4.save()
+            continue
 
         try:
             mp3 = MP3(dest_path, ID3=EasyID3)
