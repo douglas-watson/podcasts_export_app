@@ -61,13 +61,14 @@ class MainWindow(QMainWindow):
         # Episodes display
         self.table = QTableWidget()
         self.table.setRowCount(8)
-        self.table.setColumnCount(5)
-        self.table.setHorizontalHeaderLabels(["Author", "Podcast", "Episode", "Date", "Index"])
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["Author", "Podcast", "Episode", "Date", "Index", "Duration"])
         self.table.setColumnWidth(0, 150)
         self.table.setColumnWidth(1, 150)
         self.table.setColumnWidth(2, 300)
         self.table.setColumnWidth(3, 100)
         self.table.setColumnHidden(4, True) # Keep track of original index
+        self.table.setColumnWidth(5, 100)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         layout.addWidget(self.table, 2, 0, 1, 3)
@@ -142,6 +143,7 @@ class MainWindow(QMainWindow):
             author = QTableWidgetItem(ep[0])
             podcast = QTableWidgetItem(ep[1])
             title = QTableWidgetItem(ep[2])
+            duration = QTableWidgetItem(str(datetime.timedelta(seconds=float(ep[5]))))
 
             pubdate = datetime.datetime(2001, 1, 1) + datetime.timedelta(seconds=ep[4])
             date = QTableWidgetItem()
@@ -152,6 +154,7 @@ class MainWindow(QMainWindow):
             self.table.setItem(i, 2, title)
             self.table.setItem(i, 3, date)
             self.table.setItem(i, 4, index)
+            self.table.setItem(i, 5, duration)
 
         self.table.setSortingEnabled(True)
 

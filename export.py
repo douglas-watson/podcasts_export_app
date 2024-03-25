@@ -21,7 +21,7 @@ from mutagen.easyid3 import EasyID3
 
 
 SQL = """
-SELECT p.ZAUTHOR, p.ZTITLE, e.ZTITLE, e.ZASSETURL, e.ZPUBDATE
+SELECT p.ZAUTHOR, p.ZTITLE, e.ZTITLE, e.ZASSETURL, e.ZPUBDATE, e.ZDURATION
 from ZMTEPISODE e 
 join ZMTPODCAST p
     on e.ZPODCASTUUID = p.ZUUID 
@@ -31,7 +31,7 @@ where ZASSETURL NOTNULL;
 
 def get_downloaded_episodes(set_progress=print, emit_message=print):
     """ Returns list of episodes.
-    Format [[author, podcast, title, path, zpubdate], ...]
+    Format [[author, podcast, title, path, zpubdate, duration], ...]
     """
     return sqlite3.connect(get_db_path()).execute(SQL).fetchall()
     
@@ -44,7 +44,7 @@ def export(episodes, output_dir, set_progress=None, emit_message=print):
         os.makedirs(output_dir)
 
     counter = 0
-    for author, podcast, title, path, zpubdate in episodes:
+    for author, podcast, title, path, zpubdate, _ in episodes:
         if set_progress is not None:
             set_progress(int(counter / len(episodes) * 100))
         counter += 1
